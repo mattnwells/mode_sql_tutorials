@@ -406,3 +406,19 @@ GROUP BY year
 ORDER BY year;
 
 -- Write a query that separately counts the number of unique values in the month column and the number of unique values in the `year` column.
+
+SELECT COUNT(DISTINCT month) AS month_count, COUNT(DISTINCT year) AS year_count
+FROM tutorial.aapl_historical_stock_price;
+
+-- Write a query that separately counts the number of unique values in the month column and the number of unique values in the `year` column.
+
+SELECT COUNT(DISTINCT year) AS years_count, COUNT(DISTINCT month) AS months_count
+FROM tutorial.aapl_historical_stock_price;
+
+-- Write a query that selects the school name, player name, position, and weight for every player in Georgia, ordered by weight (heaviest to lightest). Be sure to make an alias for the table, and to reference all column names in relation to the alias.
+
+SELECT players.school_name, players.player_name, players.position, players.weight
+FROM benn.college_football_players players
+WHERE state = 'GA'
+ORDER BY players.weight DESC;
+
