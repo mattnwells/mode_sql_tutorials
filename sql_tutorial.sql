@@ -107,8 +107,8 @@ WHERE year >= 1985 AND year <= 1990;
 -- Write a query that shows all of the rows for which song_name is null.
 
 SELECT *
-  FROM tutorial.billboard_top_100_year_end
- WHERE song_name IS NULL;
+FROM tutorial.billboard_top_100_year_end
+WHERE song_name IS NULL;
  
  -- Write a query that surfaces all rows for top-10 hits for which Ludacris is part of the Group.
 
@@ -421,4 +421,42 @@ SELECT players.school_name, players.player_name, players.position, players.weigh
 FROM benn.college_football_players players
 WHERE state = 'GA'
 ORDER BY players.weight DESC;
+
+-- Write a query that displays player names, school names and conferences for schools in the "FBS (Division I-A Teams)" division.
+ 
+SELECT players.player_name, players.school_name, teams.conference, teams.division
+FROM benn.college_football_players players JOIN benn.college_football_teams teams ON players.school_name = teams.school_name
+WHERE teams.division = 'FBS (Division I-A Teams)';
+
+/*
+
+Outer joins are joins that return matched values and unmatched values from either or both tables. There are a few types of outer joins:
+
+LEFT JOIN returns only unmatched rows from the left table, as well as matched rows in both tables.
+RIGHT JOIN returns only unmatched rows from the right table , as well as matched rows in both tables.
+FULL OUTER JOIN returns unmatched rows from both tables,as well as matched rows in both tables.
+
+*/
+
+-- Write a query that performs an inner join between the tutorial.crunchbase_acquisitions table and the tutorial.crunchbase_companies table, but instead of listing individual rows, count the number of non-null rows in each table.
+
+SELECT COUNT(companies.permalink) AS companies_rowcount, COUNT(acquisitions.company_permalink) AS acquisitions_rowcount
+FROM tutorial.crunchbase_companies companies
+INNER JOIN tutorial.crunchbase_acquisitions acquisitions ON companies.permalink = acquisitions.company_permalink;
+
+-- Modify the query above to be a LEFT JOIN. Note the difference in results.
+
+SELECT COUNT(companies.permalink) AS companies_rowcount, COUNT(acquisitions.company_permalink) AS acquisitions_rowcount
+FROM tutorial.crunchbase_companies companies
+LEFT JOIN tutorial.crunchbase_acquisitions acquisitions ON companies.permalink = acquisitions.company_permalink;
+
+-- Count the number of unique companies (don't double-count companies) and unique acquired companies by state. Do not include results for which there is no state data, and order by the number of acquired companies from highest to lowest.
+
+SELECT companies.state_code, COUNT(DISTINCT(companies.permalink)) AS unique_companies, COUNT(DISTINCT(acquisitions.company_permalink)) AS unique_companies_acquired
+FROM tutorial.crunchbase_companies companies
+LEFT JOIN tutorial.crunchbase_acquisitions acquisitions ON companies.permalink = acquisitions.company_permalink
+WHERE companies.state_code IS NOT NULL
+GROUP BY companies.state_code
+ORDER BY unique_companies_acquired DESC; 
+
 
