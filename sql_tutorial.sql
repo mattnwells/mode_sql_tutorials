@@ -474,5 +474,35 @@ WHERE companies.state_code IS NOT NULL
 GROUP BY companies.state_code
 ORDER BY unique_companies_acquired DESC;
 
+-- Write a query that shows a company's name, "status" (found in the Companies table), and the number of unique investors in that company. Order by the number of investors from most to fewest. Limit to only companies in the state of New York.
+
+SELECT companies.name AS company_name, companies.status, COUNT(DISTINCT investments.investor_name) AS unique_investors
+FROM tutorial.crunchbase_companies companies 
+LEFT JOIN tutorial.crunchbase_investments investments ON companies.permalink = investments.company_permalink
+WHERE companies.state_code = 'NY'
+GROUP BY companies.name, companies.status
+ORDER BY unique_investors DESC;
+
+-- Write a query that lists investors based on the number of companies in which they are invested. Include a row for companies with no investor, and order from most companies to least.
+
+SELECT CASE WHEN investments.investor_name IS NULL THEN 'No Investors'
+ELSE investments.investor_name END AS investor, COUNT(DISTINCT companies.permalink) AS companies_invested_in
+FROM tutorial.crunchbase_companies companies
+LEFT JOIN tutorial.crunchbase_investments investments ON companies.permalink = investments.company_permalink
+GROUP BY investments.investor_name
+ORDER BY companies_invested_in DESC;
+
+-- Write a query that joins tutorial.crunchbase_companies and tutorial.crunchbase_investments_part1 using a FULL JOIN. Count up the number of rows that are matched/unmatched as in the example above.
+
+SELECT 
+  COUNT(CASE WHEN companies.permalink IS NOT NULL AND investments.company_permalink IS NULL 
+    THEN companies.permalink ELSE NULL END) AS companies_only,
+  COUNT(CASE WHEN companies.permalink IS NOT NULL AND investments.company_permalink IS NOT NULL
+    THEN companies.permalink ELSE NULL END) AS both_tables,
+  COUNT(CASE WHEN companies.permalink IS NULL AND investments.company_permalink IS NOT NULL
+    THEN investments.company_permalink ELSE NULL END) AS investments_only
+FROM tutorial.crunchbase_companies companies
+FULL JOIN tutorial.crunchbase_investments_part1 investments ON companies.permalink = investments.company_permalink;
+
 
 
