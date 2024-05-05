@@ -107,8 +107,8 @@ WHERE year >= 1985 AND year <= 1990;
 -- Write a query that shows all of the rows for which song_name is null.
 
 SELECT *
-FROM tutorial.billboard_top_100_year_end
-WHERE song_name IS NULL;
+  FROM tutorial.billboard_top_100_year_end
+ WHERE song_name IS NULL;
  
  -- Write a query that surfaces all rows for top-10 hits for which Ludacris is part of the Group.
 
@@ -339,16 +339,16 @@ SELECT CASE WHEN year = 'FR' THEN 'FR'
             WHEN year = 'SR' THEN 'SR'
             ELSE 'No Year Data' END AS year_group,
             COUNT(1) AS count
-FROM benn.college_football_players
+  FROM benn.college_football_players
 GROUP BY 1;
 
 SELECT COUNT(CASE WHEN year = 'FR' THEN 1 ELSE NULL END) AS fr_count,
        COUNT(CASE WHEN year = 'SO' THEN 1 ELSE NULL END) AS so_count,
        COUNT(CASE WHEN year = 'JR' THEN 1 ELSE NULL END) AS jr_count,
        COUNT(CASE WHEN year = 'SR' THEN 1 ELSE NULL END) AS sr_count
-FROM benn.college_football_players;
+  FROM benn.college_football_players;
   
--- Write a query that displays the number of players in each state, with FR, SO, JR, and SR players in separate columns and another column for the total number of players. Order results such that states with the most players come first.
+  -- Write a query that displays the number of players in each state, with FR, SO, JR, and SR players in separate columns and another column for the total number of players. Order results such that states with the most players come first.
   
 SELECT state,
     COUNT(CASE WHEN year = 'FR' THEN 1 ELSE NULL END) AS fr_count,
@@ -371,9 +371,9 @@ SELECT state,
        COUNT(CASE WHEN year = 'JR' THEN 1 ELSE NULL END) AS jr_count,
        COUNT(CASE WHEN year = 'SR' THEN 1 ELSE NULL END) AS sr_count,
        COUNT(1) AS total_players
-FROM benn.college_football_players
-GROUP BY state
-ORDER BY total_players DESC;
+  FROM benn.college_football_players
+ GROUP BY state
+ ORDER BY total_players DESC;
  
  -- Write a query that shows the number of players at schools with names that start with A through M, and the number at schools with names starting with N - Z.
  
@@ -396,8 +396,8 @@ FROM tutorial.aapl_historical_stock_price
 GROUP BY month
 ORDER BY 2 DESC;
  
--- WARNING: Using DISTINCT can slow queries substantially!
-
+-- WARNING: Using DISTINCT can slow queries substantially
+ 
 -- Write a query that counts the number of unique values in the month column for each year.
 
 SELECT year, COUNT(DISTINCT month) AS month_count
@@ -457,7 +457,7 @@ FROM tutorial.crunchbase_companies companies
 LEFT JOIN tutorial.crunchbase_acquisitions acquisitions ON companies.permalink = acquisitions.company_permalink
 WHERE companies.state_code IS NOT NULL
 GROUP BY companies.state_code
-ORDER BY unique_companies_acquired DESC;
+ORDER BY unique_companies_acquired DESC; 
 
 /*
 
@@ -473,8 +473,8 @@ RIGHT JOIN tutorial.crunchbase_companies companies ON companies.permalink = acqu
 WHERE companies.state_code IS NOT NULL
 GROUP BY companies.state_code
 ORDER BY unique_companies_acquired DESC;
-
--- Write a query that shows a company's name, "status" (found in the Companies table), and the number of unique investors in that company. Order by the number of investors from most to fewest. Limit to only companies in the state of New York.
+ 
+ -- Write a query that shows a company's name, "status" (found in the Companies table), and the number of unique investors in that company. Order by the number of investors from most to fewest. Limit to only companies in the state of New York.
 
 SELECT companies.name AS company_name, companies.status, COUNT(DISTINCT investments.investor_name) AS unique_investors
 FROM tutorial.crunchbase_companies companies 
@@ -492,6 +492,16 @@ LEFT JOIN tutorial.crunchbase_investments investments ON companies.permalink = i
 GROUP BY investments.investor_name
 ORDER BY companies_invested_in DESC;
 
+SELECT COUNT(CASE WHEN companies.permalink IS NOT NULL AND acquisitions.company_permalink IS NULL
+                  THEN companies.permalink ELSE NULL END) AS companies_only,
+       COUNT(CASE WHEN companies.permalink IS NOT NULL AND acquisitions.company_permalink IS NOT NULL
+                  THEN companies.permalink ELSE NULL END) AS both_tables,
+       COUNT(CASE WHEN companies.permalink IS NULL AND acquisitions.company_permalink IS NOT NULL
+                  THEN acquisitions.company_permalink ELSE NULL END) AS acquisitions_only
+  FROM tutorial.crunchbase_companies companies
+  FULL JOIN tutorial.crunchbase_acquisitions acquisitions
+    ON companies.permalink = acquisitions.company_permalink;
+    
 -- Write a query that joins tutorial.crunchbase_companies and tutorial.crunchbase_investments_part1 using a FULL JOIN. Count up the number of rows that are matched/unmatched as in the example above.
 
 SELECT 
@@ -504,5 +514,24 @@ SELECT
 FROM tutorial.crunchbase_companies companies
 FULL JOIN tutorial.crunchbase_investments_part1 investments ON companies.permalink = investments.company_permalink;
 
+/* 
+Note that UNION only appends distinct values. More specifically, when you use UNION, the dataset is appended, and any rows in the appended table that are exactly identical to rows in the first table are dropped.
 
+SQL has strict rules for appending data:
+
+Both tables must have the same number of columns
+The columns must have the same data types in the same order as the first table 
+
+While the column names don't necessarily have to be the same, you will find that they typically do.
+*/
+
+-- Write a query that appends the two crunchbase_investments datasets above (including duplicate values). Filter the first dataset to only companies with names that start with the letter "T", and filter the second to companies with names starting with "M" (both not case-sensitive). Only include the company_permalink, company_name, and investor_name columns.
+
+SELECT company_permalink, company_name, investor_name
+FROM tutorial.crunchbase_investments_part1
+WHERE company_name ILIKE 'T%'
+UNION ALL
+SELECT company_permalink, company_name, investor_name
+FROM tutorial.crunchbase_investments_part2
+WHERE company_name ILIKE 'M%';
 
