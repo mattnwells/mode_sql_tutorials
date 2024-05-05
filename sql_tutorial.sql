@@ -1,3 +1,7 @@
+----------------------------
+---- BASIC SQL TUTORIAL ----
+----------------------------
+
 SELECT *
 FROM tutorial.us_housing_units;
   
@@ -189,6 +193,10 @@ FROM tutorial.billboard_top_100_year_end
 WHERE year_rank BETWEEN 10 AND 20 -- Selects ranks 10-20
   AND year IN(1993, 2003, 2013) -- Selects relevant years
 ORDER BY year, year_rank;
+
+-----------------------------------
+---- INTERMEDIATE SQL TUTORIAL ----
+-----------------------------------
 
 -- Write a query to count the number of non-null rows in the low column.
 
@@ -530,8 +538,47 @@ While the column names don't necessarily have to be the same, you will find that
 SELECT company_permalink, company_name, investor_name
 FROM tutorial.crunchbase_investments_part1
 WHERE company_name ILIKE 'T%'
+  
 UNION ALL
+  
 SELECT company_permalink, company_name, investor_name
 FROM tutorial.crunchbase_investments_part2
 WHERE company_name ILIKE 'M%';
+
+-- Write a query that shows 3 columns. The first indicates which dataset (part 1 or 2) the data comes from, the second shows company status, and the third is a count of the number of investors.
+-- Hint: you will have to use the tutorial.crunchbase_companies table as well as the investments tables. And you'll want to group by status and dataset.
+
+SELECT 'investments_part1' AS dataset_name, companies.status, COUNT(DISTINCT investments.investor_permalink) AS investors
+FROM tutorial.crunchbase_companies companies
+LEFT JOIN tutorial.crunchbase_investments_part1 investments ON companies.permalink = investments.company_permalink
+GROUP BY 1,2
+
+UNION ALL
+ 
+SELECT 'investments_part2' AS dataset_name, companies.status, COUNT(DISTINCT investments.investor_permalink) AS investors
+FROM tutorial.crunchbase_companies companies
+LEFT JOIN tutorial.crunchbase_investments_part2 investments ON companies.permalink = investments.company_permalink
+GROUP BY 1,2;
+
+-- Note: You can enter any type of conditional statement into the ON clause! AND, >, <, etc. This allows you to join only relevant rows without joining all rows and filtering after the fact.
+-- Note: Joining on multiple keys can increase accuracy and query speed. 
+
+-- Joining a table to itself, exmaple: You want to identify companies that received an investment from Great Britain following an investment from Japan.
+
+SELECT DISTINCT japan_investments.company_name, japan_investments.company_permalink
+FROM tutorial.crunchbase_investments_part1 japan_investments
+  JOIN tutorial.crunchbase_investments_part1 gb_investments
+    ON japan_investments.company_name = gb_investments.company_name
+     AND gb_investments.investor_country_code = 'GBR'
+     AND gb_investments.funded_at > japan_investments.funded_at
+WHERE japan_investments.investor_country_code = 'JPN'
+ORDER BY 1;
+
+-------------------------------
+---- ADVANCED SQL TUTORIAL ---- 
+-------------------------------
+
+
+
+
 
