@@ -567,10 +567,10 @@ GROUP BY 1,2;
 
 SELECT DISTINCT japan_investments.company_name, japan_investments.company_permalink
 FROM tutorial.crunchbase_investments_part1 japan_investments
-  JOIN tutorial.crunchbase_investments_part1 gb_investments
-    ON japan_investments.company_name = gb_investments.company_name
-     AND gb_investments.investor_country_code = 'GBR'
-     AND gb_investments.funded_at > japan_investments.funded_at
+JOIN tutorial.crunchbase_investments_part1 gb_investments
+  ON japan_investments.company_name = gb_investments.company_name
+    AND gb_investments.investor_country_code = 'GBR'
+    AND gb_investments.funded_at > japan_investments.funded_at
 WHERE japan_investments.investor_country_code = 'JPN'
 ORDER BY 1;
 
@@ -578,10 +578,29 @@ ORDER BY 1;
 ---- ADVANCED SQL TUTORIAL ---- 
 -------------------------------
 
+-- Note: COUNT works with all data types, SUM only works with numeric data types. 
+
 -- Convert the funding_total_usd and founded_at_clean columns in the tutorial.crunchbase_companies_clean_date table to strings (varchar format) using a different formatting function for each one.
 
 SELECT CAST(funding_total_usd AS varchar) AS funding_total_usd_string, founded_at_clean::varchar AS founded_at_string
 FROM tutorial.crunchbase_companies_clean_date;
+
+-- Write a query that counts the number of companies acquired within 3 years, 5 years, and 10 years of being founded (in 3 separate columns). Include a column for total companies acquired as well. Group by category and limit to only rows with a founding date.
+
+SELECT companies.category_code,
+       COUNT(CASE WHEN acquisitions.acquired_at_cleaned <= companies.founded_at_clean::timestamp + INTERVAL '3 years'
+                       THEN 1 ELSE NULL END) AS acquired_3_yrs,
+       COUNT(CASE WHEN acquisitions.acquired_at_cleaned <= companies.founded_at_clean::timestamp + INTERVAL '5 years'
+                       THEN 1 ELSE NULL END) AS acquired_5_yrs,
+       COUNT(CASE WHEN acquisitions.acquired_at_cleaned <= companies.founded_at_clean::timestamp + INTERVAL '10 years'
+                       THEN 1 ELSE NULL END) AS acquired_10_yrs,
+       COUNT(1) AS total
+  FROM tutorial.crunchbase_companies_clean_date companies
+  JOIN tutorial.crunchbase_acquisitions_clean_date acquisitions
+    ON acquisitions.company_permalink = companies.permalink
+ WHERE founded_at_clean IS NOT NULL
+ GROUP BY 1
+ ORDER BY 5 DESC;
 
 
 
