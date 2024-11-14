@@ -614,4 +614,33 @@ SELECT location,
   CONCAT('(', lat, ', ', lon, ')') AS lat_lon_concat
 FROM tutorial.sf_crime_incidents_2014_01;
 
+-- Create the same concatenated location field, but using the || syntax instead of CONCAT.
+
+SELECT location, 
+  '(' || lat || ', ' || lon || ')' AS lat_lon_concat
+FROM tutorial.sf_crime_incidents_2014_01;
+
+-- Write a query that creates a date column formatted YYYY-MM-DD.
+
+SELECT date, 
+  SUBSTR(date, 7, 4) || '-' || LEFT(date, 2) || '-' || SUBSTR(date, 4, 2) AS cleaned_date
+FROM tutorial.sf_crime_incidents_2014_01;
+
+--  Write a query that returns the `category` field, but with the first letter capitalized and the rest of the letters in lower-case.
+
+SELECT category, 
+  UPPER(LEFT(category, 1)) || LOWER(RIGHT(category, LENGTH(category) - 1)) AS category_clean
+FROM tutorial.sf_crime_incidents_2014_01;
+
+-- Write a query that creates an accurate timestamp using the date and time columns in tutorial.sf_crime_incidents_2014_01. Include a field that is exactly 1 week later as well.
+
+SELECT incidnt_num,
+  (SUBSTR(date, 7, 4) || '-' || LEFT(date, 2) || '-' || SUBSTR(date, 4, 2) || ' ' || time || ':00')::timestamp AS timestamp,
+  (SUBSTR(date, 7, 4) || '-' || LEFT(date, 2) || '-' || SUBSTR(date, 4, 2) || ' ' || time || ':00')::timestamp + INTERVAL '1week' AS timestamp_plus_interval
+FROM tutorial.sf_crime_incidents_2014_01;
+
+
+
+
+
 
