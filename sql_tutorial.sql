@@ -654,8 +654,17 @@ SELECT *,
   NOW() AT TIME ZONE 'PST' - cleaned_date AS time_ago 
 FROM tutorial.sf_crime_incidents_cleandate;
 
+-- Use COALESCE to replace NULLS. Example: COALESCE(descript, 'No Description') replaces NULL descriptions with 'No Description'. 
 
+-- Write a query that selects all Warrant Arrests from the tutorial.sf_crime_incidents_2014_01 dataset, then wrap it in an outer query that only displays unresolved incidents.
 
+SELECT sub.*
+  FROM (
+    SELECT *
+    FROM tutorial.sf_crime_incidents_2014_01
+    WHERE descript = 'WARRANT ARREST'
+  ) sub
+WHERE sub.resolution = 'NONE';
 
 
 
