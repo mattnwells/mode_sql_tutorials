@@ -639,6 +639,25 @@ SELECT incidnt_num,
   (SUBSTR(date, 7, 4) || '-' || LEFT(date, 2) || '-' || SUBSTR(date, 4, 2) || ' ' || time || ':00')::timestamp + INTERVAL '1week' AS timestamp_plus_interval
 FROM tutorial.sf_crime_incidents_2014_01;
 
+-- Write a query that counts the number of incidents reported by week. Cast the week as a date to get rid of the hours/minutes/seconds.
+
+SELECT DATE_TRUNC('week', cleaned_date)::date AS week_beginning, 
+  COUNT(*) AS incidents
+FROM tutorial.sf_crime_incidents_cleandate
+GROUP BY 1
+ORDER BY 1;
+
+-- Write a query that shows exactly how long ago each indicent was reported. Assume that the dataset is in Pacific Standard Time (UTC - 8).
+
+SELECT *, 
+  NOW() AT TIME ZONE 'PST' AS now,
+  NOW() AT TIME ZONE 'PST' - cleaned_date AS time_ago 
+FROM tutorial.sf_crime_incidents_cleandate;
+
+
+
+
+
 
 
 
