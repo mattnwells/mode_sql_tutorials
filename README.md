@@ -1,2 +1,2 @@
 # mode_sql_tutorials
-SQL / Mode Tutorials
+Mode SQL Beginner, Intermediate, and Advanced tutorials.
